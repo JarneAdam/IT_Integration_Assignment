@@ -13,6 +13,6 @@ resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2022-10-01-preview
   location: location
   sku: {
     name: 'Basic'
+    tier: 'Basic'
   }
-  properties: {}
 }
