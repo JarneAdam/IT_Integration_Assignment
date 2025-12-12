@@ -32,3 +32,18 @@ resource serviceBusQueue 'Microsoft.ServiceBus/namespaces/queues@2022-10-01-prev
     maxDeliveryCount: 10
   }
 }
+
+// 3. Service Bus Queue (The "second" queue for the output)
+resource serviceBusQueueOutput 'Microsoft.ServiceBus/namespaces/queues@2022-10-01-preview' = {
+  parent: serviceBusNamespace
+  name: 'sbq-processed' 
+  properties: {
+    lockDuration: 'PT5M'
+    maxSizeInMegabytes: 1024
+    requiresDuplicateDetection: false
+    requiresSession: false
+    defaultMessageTimeToLive: 'P14D'
+    deadLetteringOnMessageExpiration: false
+    maxDeliveryCount: 10
+  }
+}
