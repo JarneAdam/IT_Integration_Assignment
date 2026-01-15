@@ -1,6 +1,5 @@
 using System;
-using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
+using System.Text.Json.Nodes;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
@@ -16,18 +15,44 @@ namespace Company.Function
         }
 
         [Function(nameof(ProcessMessage))]
-        // OUTPUT: Sends the result to the second queue 'sbq-processed'
         [ServiceBusOutput("sbq-processed", Connection = "ServiceBusConnection")]
         public string Run(
-            // TRIGGER: Listens to the first queue 'sbq-messages'
             [ServiceBusTrigger("sbq-messages", Connection = "ServiceBusConnection")] string myQueueItem)
         {
-            _logger.LogInformation($"C# ServiceBus queue trigger function processed message: {myQueueItem}");
+            _logger.LogInformation($"Bericht ontvangen: {myQueueItem}");
 
-            // Logic: Add a timestamp to the message
-            var result = $"{myQueueItem} | Processed at: {DateTime.Now}";
+            try 
+            {
+                var data = JsonNode.Parse(myQueueItem);
 
-            return result;
+                string usdRate = data["currency"]?["rates"]?["USD"]?.ToString() ?? "Onbekend";
+
+                double btcPrice = (double?)data["crypto"]?["bitcoin"]?["eur"] ?? 0;
+                double btcChange = (double?)data["crypto"]?["bitcoin"]?["eur_24h_change"] ?? 0;
+                double ethPrice = (double?)data["crypto"]?["ethereum"]?["eur"] ?? 0;
+
+                string trend = btcChange >= 0 ? "stijging" : "daling";
+
+                string emailBody = $@"Hoi Jarne, hier is je financiële update:
+
+Wisselkoers:
+- 1 Euro is nu ${usdRate} waard.
+
+Crypto Markt:
+- Bitcoin: €{btcPrice:N2} (24u {trend} van {btcChange:N2}%)
+- Ethereum: €{ethPrice:N2}
+
+Gegenereerd op: {DateTime.Now}";
+
+                _logger.LogInformation($"Gegenereerde tekst: {emailBody}");
+
+                return emailBody;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Fout bij verwerken: {ex.Message}");
+                return "Er ging iets mis bij het verwerken van de data.";
+            }
         }
     }
 }
