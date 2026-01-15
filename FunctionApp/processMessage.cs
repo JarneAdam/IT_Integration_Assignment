@@ -31,18 +31,21 @@ namespace Company.Function
                 double btcChange = (double?)data["crypto"]?["bitcoin"]?["eur_24h_change"] ?? 0;
                 double ethPrice = (double?)data["crypto"]?["ethereum"]?["eur"] ?? 0;
 
-                string trend = btcChange >= 0 ? "stijging" : "daling";
+                string trend = btcChange >= 0 ? "stijging 📈" : "daling 📉";
 
-                string emailBody = $@"Hoi Jarne, hier is je financiële update:
+                string emailBody = $@"Beste,
 
-Wisselkoers:
-- 1 Euro is nu ${usdRate} waard.
+Hierbij ontvangen jullie de dagelijkse financiële update.
 
-Crypto Markt:
+💵 Wisselkoers:
+- 1 Euro is momenteel ${usdRate} waard.
+
+🪙 Crypto Markt:
 - Bitcoin: €{btcPrice:N2} (24u {trend} van {btcChange:N2}%)
 - Ethereum: €{ethPrice:N2}
 
-Gegenereerd op: {DateTime.Now}";
+Met vriendelijke groet,
+De Azure Bot";
 
                 _logger.LogInformation($"Gegenereerde tekst: {emailBody}");
 
