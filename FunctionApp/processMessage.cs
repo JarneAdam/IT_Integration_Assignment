@@ -19,42 +19,59 @@ namespace Company.Function
         public string Run(
             [ServiceBusTrigger("sbq-messages", Connection = "ServiceBusConnection")] string myQueueItem)
         {
-            _logger.LogInformation($"Bericht ontvangen: {myQueueItem}");
+            _logger.LogInformation($"Bericht ontvangen voor verwerking: {myQueueItem}");
 
             try 
             {
                 var data = JsonNode.Parse(myQueueItem);
 
-                string usdRate = data["currency"]?["rates"]?["USD"]?.ToString() ?? "Onbekend";
+                // Data ophalen
+                string usdRate = data["currency"]?["rates"]?["USD"]?.ToString() ?? "Niet beschikbaar";
 
                 double btcPrice = (double?)data["crypto"]?["bitcoin"]?["eur"] ?? 0;
                 double btcChange = (double?)data["crypto"]?["bitcoin"]?["eur_24h_change"] ?? 0;
                 double ethPrice = (double?)data["crypto"]?["ethereum"]?["eur"] ?? 0;
 
-                string trend = btcChange >= 0 ? "stijging 📈" : "daling 📉";
+                // Logica voor trend tekst (zonder emoji's)
+                string trend = btcChange >= 0 ? "stijging" : "daling";
 
-                string emailBody = $@"Beste,
+                // Professionele e-mail opmaak
+                string emailBody = $@"Onderwerp: Dagelijks Financieel Marktoverzicht
 
-Hierbij ontvangen jullie de dagelijkse financiële update.
+Geachte lezer,
 
-💵 Wisselkoers:
-- 1 Euro is momenteel ${usdRate} waard.
+Hierbij ontvangt u de geautomatiseerde update betreffende de actuele marktkansen.
 
-🪙 Crypto Markt:
-- Bitcoin: €{btcPrice:N2} (24u {trend} van {btcChange:N2}%)
-- Ethereum: €{ethPrice:N2}
+WISSELKOERSEN (FOREX)
+--------------------------------------------------
+De wisselkoers van de Euro ten opzichte van de Amerikaanse Dollar bedraagt momenteel:
+1 EUR = {usdRate} USD
+
+CRYPTOVALUTA OVERZICHT
+--------------------------------------------------
+Bitcoin (BTC):
+- Huidige waarde: EUR {btcPrice:N2}
+- Marktontwikkeling (24u): Een {trend} van {btcChange:N2}%
+
+Ethereum (ETH):
+- Huidige waarde: EUR {ethPrice:N2}
+
+--------------------------------------------------
+Rapport gegenereerd op: {DateTime.Now:dd-MM-yyyy HH:mm}
+Status: Succesvol verwerkt via Azure Service Bus.
 
 Met vriendelijke groet,
-De Azure Bot";
 
-                _logger.LogInformation($"Gegenereerde tekst: {emailBody}");
+Uw Azure Cloud Systeem";
+
+                _logger.LogInformation("E-mail tekst succesvol gegenereerd.");
 
                 return emailBody;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Fout bij verwerken: {ex.Message}");
-                return "Er ging iets mis bij het verwerken van de data.";
+                _logger.LogError($"Fout tijdens dataverwerking: {ex.Message}");
+                return "Er is een technische fout opgetreden bij het genereren van het rapport.";
             }
         }
     }
