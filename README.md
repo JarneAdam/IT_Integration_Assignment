@@ -5,7 +5,7 @@ Dit project is een volledig serverless integratie-oplossing gebouwd op Microsoft
 
 ## Architectuur
 
-Het project volgt het "Separation of Concerns" principe: het ophalen van de data (Azure Function) is strikt gescheiden van het verzenden van de notificatie (Logic App). Ze communiceren asynchroon met elkaar via Azure Service Bus.
+Het project volgt het "Separation of Concerns" principe: het ophalen van de data (Azure Function) is strikt gescheiden van het verzenden van de notificatie (Logic App)[cite: 1]. Ze communiceren asynchroon met elkaar via Azure Service Bus[cite: 1].
 
 ```mermaid
 graph TD
