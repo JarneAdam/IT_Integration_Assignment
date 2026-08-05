@@ -1,0 +1,41 @@
+# =========================
+# Mac OS files
+# =========================
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+__MACOSX/
+
+# =========================
+# .NET / C# (Binaries en Objects)
+# =========================
+bin/
+obj/
+*.user
+*.userprefs
+TestResults/
+*.suo
+*.userosscache
+*.sln.docstates
+
+# =========================
+# Azure Functions
+# =========================
+# ZORG DAT DEZE ALTIJD GENEGEERD WORDT (bevat API keys/wachtwoorden)
+local.settings.json
+secrets.json
+.azurefunctions/
+
+# =========================
+# VS Code (Optioneel)
+# =========================
+# Negeert de lokale workspace geschiedenis van VS Code
+.vscode/.history/
