@@ -41,28 +41,28 @@ namespace Company.Function
                 string cryptoJson = await _httpClient.GetStringAsync("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=eur&include_24hr_change=true");
                 var cryptoData = JsonNode.Parse(cryptoJson);
 
-                double btcPrice = cryptoData?["bitcoin"]?["eur"] != null ? (double)cryptoData["bitcoin"]["eur"]! : 0;
-                double btcChange = cryptoData?["bitcoin"]?["eur_24h_change"] != null ? (double)cryptoData["bitcoin"]["eur_24h_change"]! : 0;
-                double ethPrice = cryptoData?["ethereum"]?["eur"] != null ? (double)cryptoData["ethereum"]["eur"]! : 0;
+                double btcPrice = cryptoData?["bitcoin"]?["eur"]?.GetValue<double>() ?? 0;
+                double btcChange = cryptoData?["bitcoin"]?["eur_24h_change"]?.GetValue<double>() ?? 0;
+                double ethPrice = cryptoData?["ethereum"]?["eur"]?.GetValue<double>() ?? 0;
 
                 string trend = btcChange >= 0 ? "stijging" : "daling";
 
                 string emailBody = $@"Geachte lezer,<br><br>
-Hierbij ontvangt u de geautomatiseerde update betreffende de actuele marktkansen.<br><br>
-<b>WISSELKOERSEN (FOREX)</b><br>
---------------------------------------------------<br>
-De wisselkoers van de Euro ten opzichte van de Amerikaanse Dollar bedraagt momenteel:<br>
-1 EUR = <b>{usdRate} USD</b><br><br>
-<b>CRYPTOVALUTA OVERZICHT</b><br>
---------------------------------------------------<br>
-<b>Bitcoin (BTC):</b><br>
-- Huidige waarde: EUR {btcPrice:N2}<br>
-- Marktontwikkeling (24u): Een {trend} van {btcChange:N2}%<br><br>
-<b>Ethereum (ETH):</b><br>
-- Huidige waarde: EUR {ethPrice:N2}<br><br>
---------------------------------------------------<br>
-Rapport gegenereerd op: {DateTime.Now:dd-MM-yyyy HH:mm}<br>
-Status: Succesvol verwerkt via Azure Service Bus.";
+                Hierbij ontvangt u de geautomatiseerde update betreffende de actuele marktkansen.<br><br>
+                <b>WISSELKOERSEN (FOREX)</b><br>
+                --------------------------------------------------<br>
+                De wisselkoers van de Euro ten opzichte van de Amerikaanse Dollar bedraagt momenteel:<br>
+                1 EUR = <b>{usdRate} USD</b><br><br>
+                <b>CRYPTOVALUTA OVERZICHT</b><br>
+                --------------------------------------------------<br>
+                <b>Bitcoin (BTC):</b><br>
+                - Huidige waarde: EUR {btcPrice:N2}<br>
+                - Marktontwikkeling (24u): Een {trend} van {btcChange:N2}%<br><br>
+                <b>Ethereum (ETH):</b><br>
+                - Huidige waarde: EUR {ethPrice:N2}<br><br>
+                --------------------------------------------------<br>
+                Rapport gegenereerd op: {DateTime.Now:dd-MM-yyyy HH:mm}<br>
+                Status: Succesvol verwerkt via Azure Service Bus.";
 
                 string combinedJsonPayload = $@"{{ ""forex_data"": {forexJson}, ""crypto_data"": {cryptoJson} }}";
 
