@@ -33,6 +33,7 @@ jobs:
       - name: Validate Bicep deployment
         uses: azure/arm-deploy@v2
         with:
+          scope: resourcegroup # <-- HIER TOEGEVOEGD
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           resourceGroupName: ${{ env.RESOURCE_GROUP_NAME }}
           template: ./main.bicep
@@ -91,6 +92,7 @@ jobs:
         uses: azure/arm-deploy@v2
         id: deploy
         with:
+          scope: resourcegroup # <-- HIER TOEGEVOEGD
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           resourceGroupName: ${{ env.RESOURCE_GROUP_NAME }}
           template: ./main.bicep
