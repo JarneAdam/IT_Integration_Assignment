@@ -63,9 +63,16 @@ namespace Company.Function
 
                 string combinedJsonPayload = $@"{{ ""forex_data"": {forexJson}, ""weather_data"": {weatherJson} }}";
 
+                var serviceBusPakketje = new {
+                    Onderwerp = $"Dagelijkse Update: Markt & Weer ({DateTime.Now:dd-MM-yyyy})",
+                    Inhoud = emailBody
+                };
+
+                string jsonServiceBusMessage = System.Text.Json.JsonSerializer.Serialize(serviceBusPakketje);
+
                 return new MyOutputType
                 {
-                    ServiceBusMessage = emailBody,
+                    ServiceBusMessage = jsonServiceBusMessage,
                     BlobContent = combinedJsonPayload
                 };
             }
