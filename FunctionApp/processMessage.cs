@@ -24,6 +24,10 @@ namespace Company.Function
         public ProcessMessage(ILogger<ProcessMessage> logger)
         {
             _logger = logger;
+            if (!_httpClient.DefaultRequestHeaders.Contains("User-Agent"))
+            {
+                _httpClient.DefaultRequestHeaders.Add("User-Agent", "VivesHogeschoolProject/1.0");
+            }
         }
 
         [Function("GenerateDailyUpdate")]
@@ -35,36 +39,29 @@ namespace Company.Function
             {
                 string forexJson = await _httpClient.GetStringAsync("https://api.frankfurter.app/latest?from=EUR&to=USD");
                 var forexData = JsonNode.Parse(forexJson);
-
                 string usdRate = forexData?["rates"]?["USD"]?.ToString() ?? "Onbekend";
 
-                string cryptoJson = await _httpClient.GetStringAsync("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=eur&include_24hr_change=true");
-                var cryptoData = JsonNode.Parse(cryptoJson);
-
-                double btcPrice = cryptoData?["bitcoin"]?["eur"]?.GetValue<double>() ?? 0;
-                double btcChange = cryptoData?["bitcoin"]?["eur_24h_change"]?.GetValue<double>() ?? 0;
-                double ethPrice = cryptoData?["ethereum"]?["eur"]?.GetValue<double>() ?? 0;
-
-                string trend = btcChange >= 0 ? "stijging" : "daling";
+                string weatherJson = await _httpClient.GetStringAsync("https://api.open-meteo.com/v1/forecast?latitude=50.85&longitude=4.35&current_weather=true");
+                var weatherData = JsonNode.Parse(weatherJson);
+                
+                double temp = weatherData?["current_weather"]?["temperature"]?.GetValue<double>() ?? 0;
+                double windSpeed = weatherData?["current_weather"]?["windspeed"]?.GetValue<double>() ?? 0;
 
                 string emailBody = $@"Geachte lezer,<br><br>
-                Hierbij ontvangt u de geautomatiseerde update betreffende de actuele marktkansen.<br><br>
+                Hierbij ontvangt u de geautomatiseerde update met actuele data.<br><br>
                 <b>WISSELKOERSEN (FOREX)</b><br>
                 --------------------------------------------------<br>
                 De wisselkoers van de Euro ten opzichte van de Amerikaanse Dollar bedraagt momenteel:<br>
                 1 EUR = <b>{usdRate} USD</b><br><br>
-                <b>CRYPTOVALUTA OVERZICHT</b><br>
+                <b>HET WEER (Brussel)</b><br>
                 --------------------------------------------------<br>
-                <b>Bitcoin (BTC):</b><br>
-                - Huidige waarde: EUR {btcPrice:N2}<br>
-                - Marktontwikkeling (24u): Een {trend} van {btcChange:N2}%<br><br>
-                <b>Ethereum (ETH):</b><br>
-                - Huidige waarde: EUR {ethPrice:N2}<br><br>
+                - Huidige temperatuur: {temp} °C<br>
+                - Windsnelheid: {windSpeed} km/u<br><br>
                 --------------------------------------------------<br>
                 Rapport gegenereerd op: {DateTime.Now:dd-MM-yyyy HH:mm}<br>
-                Status: Succesvol verwerkt via Azure Service Bus.";
+Status: Succesvol verwerkt via Azure Service Bus.";
 
-                string combinedJsonPayload = $@"{{ ""forex_data"": {forexJson}, ""crypto_data"": {cryptoJson} }}";
+                string combinedJsonPayload = $@"{{ ""forex_data"": {forexJson}, ""weather_data"": {weatherJson} }}";
 
                 return new MyOutputType
                 {
