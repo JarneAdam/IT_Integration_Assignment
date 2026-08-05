@@ -59,7 +59,7 @@ namespace Company.Function
                 - Windsnelheid: {windSpeed} km/u<br><br>
                 --------------------------------------------------<br>
                 Rapport gegenereerd op: {DateTime.Now:dd-MM-yyyy HH:mm}<br>
-Status: Succesvol verwerkt via Azure Service Bus.";
+                Status: Succesvol verwerkt via Azure Service Bus.";
 
                 string combinedJsonPayload = $@"{{ ""forex_data"": {forexJson}, ""weather_data"": {weatherJson} }}";
 
