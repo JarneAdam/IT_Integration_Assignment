@@ -31,8 +31,7 @@ namespace Company.Function
         }
 
         [Function("GenerateDailyUpdate")]
-        //public async Task<MyOutputType> Run([TimerTrigger("0 0 8 * * *")] TimerInfo myTimer)
-        public async Task<MyOutputType> Run([TimerTrigger("0 */5 * * * *")] TimerInfo myTimer)
+        public async Task<MyOutputType> Run([TimerTrigger("0 0 8 * * *")] TimerInfo myTimer)
         {
             _logger.LogInformation($"Dagelijkse update gestart om: {DateTime.Now}");
 
